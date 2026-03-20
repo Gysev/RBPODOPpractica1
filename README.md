@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # PracticaDOPV22
+=======
+# RBPOPracrica1
+>>>>>>> b2200f5 (Initial commit)
 
 
 
@@ -15,14 +19,22 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
+<<<<<<< HEAD
 git remote add origin https://gitlab.com/isc-mtuci/2025-2026/rbpo/bas2302/zelenov_a_s/practicadopv22.git
+=======
+git remote add origin https://gitlab.com/gysev1-group/rbpopracrica1.git
+>>>>>>> b2200f5 (Initial commit)
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
+<<<<<<< HEAD
 * [Set up project integrations](https://gitlab.com/isc-mtuci/2025-2026/rbpo/bas2302/zelenov_a_s/practicadopv22/-/settings/integrations)
+=======
+* [Set up project integrations](https://gitlab.com/gysev1-group/rbpopracrica1/-/settings/integrations)
+>>>>>>> b2200f5 (Initial commit)
 
 ## Collaborate with your team
 
