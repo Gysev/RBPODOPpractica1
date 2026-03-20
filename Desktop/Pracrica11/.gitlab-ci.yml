@@ -1,0 +1,18 @@
+stages:
+  - secret_scan
+  - build
+
+secret_scan:
+  stage: secret_scan
+  # Используем официальный образ gitleaks: он содержит CLI для поиска секретов.
+  image: gitleaks/gitleaks:latest
+  script:
+    # Сканируем корень репозитория (в под-папке может отличаться структура).
+    - gitleaks detect --source "." --no-git --exit-code 1 --verbosity=info
+
+build:
+  stage: build
+  needs: ["secret_scan"]
+  script:
+    # Заглушка: по условию задания важно, что сборка не стартует при наличии секретов.
+    - echo "Build step skipped (secret scan already ran)."
