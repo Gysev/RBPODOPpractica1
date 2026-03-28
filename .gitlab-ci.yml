@@ -13,7 +13,11 @@ secret_scan:
   tags:
     - pracrica11
   image:
+<<<<<<< HEAD
     name: ghcr.io/gitleaks/gitleaks:latest
+=======
+    name: gitleaks/gitleaks:latest
+>>>>>>> fb39fd012683a17918d35e259fff5571a93dd227
     entrypoint: [""]
   script:
     - gitleaks detect --source "." --no-git --exit-code 1 --verbosity=info
