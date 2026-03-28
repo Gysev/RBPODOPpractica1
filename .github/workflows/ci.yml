@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  FFUF_VERSION: "2.1.0"
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  app-build:
+    needs: [secret-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r webapp/requirements.txt
+      - run: python -m compileall webapp
+
+  fuzz:
+    needs: [app-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq wget
+          wget -q "https://github.com/ffuf/ffuf/releases/download/v${{ env.FFUF_VERSION }}/ffuf_${{ env.FFUF_VERSION }}_linux_amd64.tar.gz" -O /tmp/ffuf.tgz
+          sudo tar -xzf /tmp/ffuf.tgz -C /usr/local/bin ffuf
+      - run: pip install -r webapp/requirements.txt
+      - run: ( cd webapp && python app.py & )
+      - run: sleep 4
+      - run: ffuf -u http://127.0.0.1:5000/FUZZ -w fuzz/wordlist.txt -mc 200,204,301,302 -t 20 -s
+
+  docker-image:
+    needs: [fuzz]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      - run: echo "GHCR_IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      - run: trivy config --exit-code 1 --severity HIGH,CRITICAL .
+      - run: docker build -t "local:${GITHUB_SHA}" .
+      - run: trivy image --exit-code 1 --severity HIGH,CRITICAL --no-progress "local:${GITHUB_SHA}"
+      - if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.event_name == 'push'
+        run: |
+          docker tag "local:${GITHUB_SHA}" "${GHCR_IMAGE}:${GITHUB_SHA}"
+          docker tag "local:${GITHUB_SHA}" "${GHCR_IMAGE}:latest"
+          docker push "${GHCR_IMAGE}:${GITHUB_SHA}"
+          docker push "${GHCR_IMAGE}:latest"
