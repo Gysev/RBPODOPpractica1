@@ -13,7 +13,7 @@ secret_scan:
   tags:
     - pracrica11
   image:
-    name: gitleaks/gitleaks:latest
+    name: ghcr.io/gitleaks/gitleaks:latest
     entrypoint: [""]
   script:
     - gitleaks detect --source "." --no-git --exit-code 1 --verbosity=info
