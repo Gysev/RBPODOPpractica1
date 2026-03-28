@@ -47,7 +47,9 @@ trivy_dockerfile:
   stage: docker_image
   tags:
     - pracrica11
-  image: ghcr.io/aquasecurity/trivy:latest
+  image:
+    name: ghcr.io/aquasecurity/trivy:latest
+    entrypoint: [""]
   needs: ["fuzz"]
   script:
     - trivy config --exit-code 1 --severity HIGH,CRITICAL .
@@ -77,7 +79,9 @@ trivy_image:
   stage: docker_image
   tags:
     - pracrica11
-  image: ghcr.io/aquasecurity/trivy:latest
+  image:
+    name: ghcr.io/aquasecurity/trivy:latest
+    entrypoint: [""]
   needs: ["docker_publish"]
   variables:
     TRIVY_USERNAME: $CI_REGISTRY_USER
