@@ -3,7 +3,8 @@ FROM python:3.12-slim
 WORKDIR /app
 
 COPY webapp/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PIP_DEFAULT_TIMEOUT=300
+RUN pip install --no-cache-dir --retries 15 --timeout 300 -r requirements.txt
 
 COPY webapp/ .
 
