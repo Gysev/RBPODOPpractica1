@@ -16,7 +16,7 @@ secret_scan:
     name: ghcr.io/gitleaks/gitleaks:latest
     entrypoint: [""]
   script:
-    - gitleaks detect --source "." --no-git --exit-code 1 --verbosity=info
+    - gitleaks detect --source "." --no-git --exit-code 1 --log-level info
 
 app_build:
   stage: app_build
