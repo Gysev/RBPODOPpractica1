@@ -1,0 +1,8 @@
+.git
+.github
+.vs
+**/*.vcxproj.user
+fuzz
+*.sln
+Pracrica11
+.gitlab-ci.yml
